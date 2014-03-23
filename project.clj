@@ -4,7 +4,11 @@
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/clojurescript "0.0-2156"]]
 
-  :plugins [[lein-cljsbuild "1.0.2"]]
+  :plugins [[lein-cljsbuild "1.0.2"]
+            [lein-npm "0.3.2"]]
+
+
+  :node-dependencies [["express" "3.x"]]
 
   :cljsbuild {
     :builds {
