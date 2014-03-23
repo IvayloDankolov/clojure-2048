@@ -1,0 +1,18 @@
+body {
+  margin-top: 100px;
+
+  background: #faf8ef;
+  color: #776e65;
+
+  font-family: "Helvetica Neue", Arial, sans-serif;
+}
+
+.game {
+  width: 600px;
+  margin: auto;
+}
+
+h1 {
+  font-size: 60px;
+  font-weight: bold;
+}
