@@ -2,7 +2,7 @@
   (:require [clojure-2048.core :refer [move add-tile game-state]]
             [clojure.browser.repl :as repl]))
 
-(repl/connect "http://localhost:9000/repl")
+(js/setTimeout #(repl/connect "http://localhost:9000/repl") 0)
 
 (def test-board
   [{:value 2 :x 0 :y 0}
