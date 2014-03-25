@@ -85,3 +85,5 @@
     (if (not= moved game)
       (add-tile moved)
       moved)))
+
+(defn start-game [] (add-tile (add-tile [])))
