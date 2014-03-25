@@ -13,14 +13,16 @@
   :cljsbuild {
     :builds {
       :server {
-        :source-paths ["src/clojure-2048/server"]
+        :source-paths ["src/clojure-2048/server"
+                       "src/clojure-2048/shared"]
         :compiler {:output-to "resources/server.js"
                    :optimizations :simple
                    :target :nodejs
                    :pretty-print true}}
 
       :client {
-        :source-paths ["src/clojure-2048/client"]
+        :source-paths ["src/clojure-2048/client"
+                       "src/clojure-2048/shared"]
         :compiler {:output-to "resources/public/js/cljs.js"
                    :optimizations :simple
                    :pretty-print true}}}}

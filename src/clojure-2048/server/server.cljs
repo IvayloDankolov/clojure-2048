@@ -1,4 +1,4 @@
-(ns hello-clojurescript.server
+(ns clojure-2048.server
   (:require [cljs.nodejs :as node]))
 
 (def express (node/require "express"))
