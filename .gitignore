@@ -14,7 +14,8 @@ pom.xml.asc
 
 # ClojureScript
 
-resources/public/js/cljs.js
+/resources/public/js/cljs.js
+/resources/server.js
 
 # Node
 
