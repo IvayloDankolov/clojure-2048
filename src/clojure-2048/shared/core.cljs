@@ -32,7 +32,8 @@
                         :up    :x
                         :down  :x})]
     (->> game
-         (partition-by col-field)
+         (group-by col-field)
+         (map second)
          (mapcat #(move-row % dir))
          vec)))
 
@@ -78,3 +79,9 @@
 
    :else
    :in-progress))
+
+(defn step-game [game dir]
+  (let [moved (move game dir)]
+    (if (not= moved game)
+      (add-tile moved)
+      moved)))
