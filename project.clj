@@ -1,6 +1,6 @@
-(defproject clojure-2048 "0.1.0-SNAPSHOT"
-  :description "FIXME: write this!"
-  :url "http://example.com/FIXME"
+(defproject clojure-2048 "0.0.0"
+  :description "2048 clone written in ClojureScript with server-side additions to come in the future."
+  :url "https://github.com/IvayloDankolov/clojure-2048/"
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [org.clojure/clojurescript "0.0-2156"]]
 
