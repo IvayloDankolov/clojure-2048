@@ -35,7 +35,7 @@
          (group-by col-field)
          (map second)
          (mapcat #(move-row % dir))
-         vec)))
+         set)))
 
 ;;
 
@@ -86,4 +86,4 @@
       (add-tile moved)
       moved)))
 
-(defn start-game [] (add-tile (add-tile [])))
+(defn start-game [] (add-tile (add-tile #{})))
