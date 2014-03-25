@@ -7,17 +7,27 @@
 
             [goog.dom.classes :as classes]))
 
+(defn value-string [value]
+  (if (<= value 2048)
+                   (str value)
+                   "super"))
+
 (defn get-classes [{:keys [x y value]}]
-  [".tile"
-   (str ".tile-position-" (inc x) "-" (inc y))
-   (str ".tile-" (if (<= value 2048)
-                   value
-                   "super"))])
+  ["tile"
+   (str "tile-position-" (inc x) "-" (inc y))
+   (str "tile-" (value-string value))])
+
 
 (defn make-js-tile [tile]
-  (let [js-tile (.createElement js/document "div")]
+  (let [js-tile (.createElement js/document "div")
+        inner   (.createElement js/document "div")]
     (doseq [cls (get-classes tile)]
       (classes/add js-tile cls))
+
+    (classes/add inner "tile-inner")
+    (aset inner "textContent" (value-string (:value tile)))
+    (.appendChild js-tile inner)
+
     js-tile))
 
 
