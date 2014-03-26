@@ -1,5 +1,5 @@
 (ns clojure-2048.client
-  (:require [clojure-2048.core :refer [move start-game game-state step-game]]
+  (:require [clojure-2048.core :as game]
 
             [clojure.browser.repl :as repl]
 
@@ -16,7 +16,7 @@
                    (str value)
                    "super"))
 
-(defn get-classes [{:keys [x y value]}]
+(defn get-classes [{value :value [x y] :pos}]
   ["tile"
    (str "tile-position-" (inc x) "-" (inc y))
    (str "tile-" (value-string value))])
@@ -29,12 +29,16 @@
       (classes/add js-tile cls))
 
     (classes/add inner "tile-inner")
-    (aset inner "textContent" (value-string (:value tile)))
+    (aset inner "textContent" (str (:value tile)))
     (.appendChild js-tile inner)
 
     js-tile))
 
-(defn repaint-game [game]
+
+(def game
+  (atom (game/start-game)))
+
+(defn repaint-game! [game]
   (let [tile-container
         (. js/document querySelector ".tile-container")]
     (loop [c (.-firstChild tile-container)]
@@ -45,22 +49,35 @@
       (. tile-container appendChild (make-js-tile tile)))))
 
 
-(def game
-  (atom (start-game)))
-
 (def move-keys {37 :left
                 38 :up
                 39 :right
                 40 :down})
 
+(def rotate-keys {74 :quarter-up
+                  75 :quarter-down})
+
+(defn move-game! [key-code]
+  (let [dir (move-keys key-code)]
+    (swap! game #(game/step-game % dir))
+    (repaint-game! @game)
+    true))
+
+(defn rotate-game! [key-code]
+  (let [rot-name (rotate-keys key-code)
+        rot (game/rotations rot-name)]
+    (swap! game (partial game/rotate rot))
+    (repaint-game! @game)
+    true))
+
+
 (events/listen js/window (.-KEYDOWN events/EventType)
   (fn [event]
-    (let [code (.-keyCode event)
-          dir (move-keys code)]
-      (when dir
-        (swap! game #(step-game % dir))
-        (repaint-game @game)
+    (let [key-code (.-keyCode event)]
+      (if (cond
+           (move-keys key-code) (move-game! key-code)
+           (rotate-keys key-code) (rotate-game! key-code))
         (.preventDefault event)))))
 
-(repaint-game @game)
+(repaint-game! @game)
 

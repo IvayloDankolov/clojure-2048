@@ -1,5 +1,6 @@
 (ns clojure-2048.core
-  (:require [clojure-2048.util :refer [cartesian collapse-if]]))
+  (:require [clojure-2048.util :refer [cartesian collapse-if]]
+            [clojure-2048.matrix :as mat]))
 
 (defn- can-collapse-cells? [cell1 cell2]
   (= (:value cell1) (:value cell2)))
@@ -8,40 +9,51 @@
   (update-in cell1 [:value] #(* 2 %)))
 
 
-(defn- move-row [row dir]
-  (let [row-field (dir {:left  :x
-                        :right :x
-                        :up    :y
-                        :down  :y})
-        row-direction (dir {:left  <
-                            :right >
-                            :up    <
-                            :down  >})
-        row-indices (dir {:left  (range 4)
-                          :right (range 3 -1 -1)
-                          :up    (range 4)
-                          :down  (range 3 -1 -1)})]
-    (->> row
-         (sort-by row-field row-direction)
-         (collapse-if can-collapse-cells? collapse-cells)
-         (map #(assoc %2 row-field %1) row-indices))))
+(defn- move-row-left [row]
+  (->> row
+       (sort-by (comp first :pos))
+       (collapse-if can-collapse-cells? collapse-cells)
+       (map #(assoc-in %2 [:pos 0] %1) (range))))
+
+(defn- move-left [game]
+  (->> game
+       (group-by (comp second :pos))
+       (map second)
+       (mapcat move-row-left)
+       set))
+
+(def rotations
+  {:none         (mat/rotation-around 0                 1.5 1.5)
+   :quarter-down (mat/rotation-around (/ Math/PI 2)     1.5 1.5)
+   :quarter-up   (mat/rotation-around (- (/ Math/PI 2)) 1.5 1.5)
+   :half         (mat/rotation-around Math/PI           1.5 1.5)
+   })
+
+(defn- left-based-rotations [dir]
+  (dir {:left  [(rotations :none) (rotations :none)]
+        :right [(rotations :half) (rotations :half)]
+        :up    [(rotations :quarter-up)   (rotations :quarter-down)]
+        :down  [(rotations :quarter-down) (rotations :quarter-up)]}))
+
+(defn- rotate-tile [rotation tile]
+  (update-in tile [:pos] (partial mat/transform-projective-int
+                                  rotation)))
+
+(defn rotate [rotation game]
+  (map (partial rotate-tile rotation) game))
 
 (defn move [game dir]
-  (let [col-field (dir {:left  :y
-                        :right :y
-                        :up    :x
-                        :down  :x})]
+  (let [[to-left from-left] (left-based-rotations dir)]
     (->> game
-         (group-by col-field)
-         (map second)
-         (mapcat #(move-row % dir))
-         set)))
+         (rotate to-left)
+         (move-left)
+         (rotate from-left))))
 
 ;;
 
 (defn- tile-positions [game]
   (->> game
-       (map (juxt :x :y))
+       (map :pos)
        set))
 
 (defn- random-empty-pos [game]
@@ -56,10 +68,9 @@
     2))
 
 (defn- new-tile [game]
-  (if-let [[x y] (random-empty-pos game)]
+  (if-let [pos (random-empty-pos game)]
     {:value (random-tile-value)
-     :x x
-     :y y}))
+     :pos pos}))
 
 (defn add-tile [game]
   (if-let [tile (new-tile game)]
