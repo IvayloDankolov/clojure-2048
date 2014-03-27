@@ -47,7 +47,8 @@
     (->> game
          (rotate to-left)
          (move-left)
-         (rotate from-left))))
+         (rotate from-left)
+         set)))
 
 ;;
 
